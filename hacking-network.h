@@ -34,38 +34,19 @@ int send_string(int sockfd, unsigned char *buffer) {
  * the destination buffer is terminated before these bytes.
  * Returns the size of the read line (without EOL bytes).
  */
-int recv_line(int sockfd, unsigned char *dest_buffer, enum RecvMsgType rcvtype, int chars) {
-
-#define EOF "\r\n\r\n" // End-Of-Line byte sequence
-#define EOF_SIZE 4
+int recv_line(int sockfd, unsigned char *dest_buffer) {
 #define EOL "\r\n"
 #define EOL_SIZE 2
 
 	unsigned char *ptr;
 	ptr = dest_buffer;
 
-	if(rcvtype == CONTENT){
-		recv(sockfd, ptr, chars, 0);
-		*(ptr+1) = '\0';
-		return strlen(dest_buffer);
-	}
-
-	char *eos;
-	int eos_size;
-	if(rcvtype == HEADER){
-		eos = EOL;
-		eos = EOL_SIZE;
-	} else if(rcvtype == BODY){
-		eos = EOF;
-		eos_size = EOF_SIZE;
-	}
-
 	int eol_matched = 0;
 
 	while(recv(sockfd, ptr, 1, 0) == 1) { // read a single byte
-		if(*ptr == eos[eol_matched]) { // does this byte match terminator
+		if(*ptr == EOL[eol_matched]) { // does this byte match terminator
 			eol_matched++;
-			if(eol_matched == eos_size) { // if all bytes match terminator,
+			if(eol_matched == EOL_SIZE) { // if all bytes match terminator,
 				*(ptr+1) = '\0';//*(ptr+1-EOL_SIZE) = '\0'; // terminate the string
 				return strlen(dest_buffer); // return bytes recevied
 			}

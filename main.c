@@ -8,6 +8,7 @@
 #include <arpa/inet.h>
 #include "hacking.h"
 #include "hacking-network.h"
+#include "linked_list.h"
 
 #define PORT 8080   // the port users will be connecting to
 #define WEBROOT "./webroot" // the web server's root directory
@@ -16,6 +17,18 @@ void handle_connection(int, struct sockaddr_in *); // handle web requests
 int get_file_size(int); // returns the filesize of open file descriptor
 
 int main(void) {
+
+//	struct Linked_List list;
+//
+//	init_list(&list, 5);
+//	strcpy(list.keys[0], "hello");
+//	strcpy(list.keys[1], "qwertyuiopasdfghjklzxcv");
+//	printf("keyA: %s\tkeyB: %s\tkeyC: %s\n", list.keys[0], list.keys[1], list.keys[2]);
+//
+//
+//	end(&list);
+//	return 0;
+
 	int sockfd, new_sockfd, yes=1;
 	struct sockaddr_in host_addr, client_addr;   // my address information
 	socklen_t sin_size;
@@ -57,10 +70,12 @@ int main(void) {
  */
 void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 	unsigned char *ptr, request[1000], resource[500];
-	int fd, length;
+	int fd, length, contentLength;
 	enum HTTPType type;
+	struct Linked_List headers;
+	init_list(&headers, 10);
 
-	length = recv_line(sockfd, request, HEADER, 0);
+	length = recv_line(sockfd, request);
 	//dump(request, length);
 	printf("Got request from %s:%d \"%s\"\n", inet_ntoa(client_addr_ptr->sin_addr), ntohs(client_addr_ptr->sin_port), request);
 
@@ -81,6 +96,24 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 		if(strncmp(request, "POST ", 5) == 0){
 			ptr = request + 5;
 			type = POST;
+			length = recv_line(sockfd, request);	//TODO: update linked list realtime
+			unsigned char* contentpos = strstr(request, "Content-Length: ");
+			contentpos += 16;
+			unsigned char* ptra = contentpos;
+			int found = 0, eol_matched = 0;
+			while(!found){	//TODO: duplicate, functionize?
+				if(*ptra == EOL[eol_matched]) {
+					eol_matched++;
+					if(eol_matched == EOL_SIZE) {
+						*(ptra+1-EOL_SIZE) = '\0';
+						found = 1;
+					}
+				} else {
+					eol_matched = 0;
+				}
+				ptra++;
+			}
+			contentLength = atoi(contentpos);
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");
@@ -101,7 +134,7 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 				printf(" 200 OK\n");
 				send_string(sockfd, "HTTP/1.0 200 OK\r\n");
 				send_string(sockfd, "Server: Tiny webserver\r\n\r\n");
-				if(type == GET) { // then this is a GET request
+				if(type == GET || type == POST) { // then this is a GET request
 					if( (length = get_file_size(fd)) == -1)
 						fatal("getting resource file size");
 					if( (ptr = (unsigned char *) malloc(length)) == NULL)
@@ -109,8 +142,6 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 					read(fd, ptr, length); // read the file into memory	//TODO:
 					send(sockfd, ptr, length, 0);  // send it to socket
 					free(ptr); // free file memory
-				} else if(type == POST){
-
 				}
 				close(fd); // close the file		//TODO:
 			} // end if block for file found/not found
