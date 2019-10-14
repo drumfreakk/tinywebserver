@@ -74,7 +74,7 @@ char* getValueByKey(struct Linked_List *list, char *key){
 void end(struct Linked_List *list){
 	for(int i = 0; i < list->size; i++){
 		free(list->keys[i]);
-		free(list->keys[i]);
+		free(list->values[i]);
 	}
 	free(list->keys);
 	free(list->values);

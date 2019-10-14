@@ -69,11 +69,11 @@ int main(void) {
  * passed socket is closed at the end of the function.
  */
 void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
-	unsigned char *ptr, request[1000], resource[500];
+	unsigned char *ptr, request[500], resource[500], header[500], content[500];
 	int fd, length, contentLength;
 	enum HTTPType type;
 	struct Linked_List headers;
-	init_list(&headers, 10);
+	init_list(&headers, 20);
 
 	length = recv_line(sockfd, request);
 	//dump(request, length);
@@ -96,24 +96,27 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 		if(strncmp(request, "POST ", 5) == 0){
 			ptr = request + 5;
 			type = POST;
-			length = recv_line(sockfd, request);	//TODO: update linked list realtime
-			unsigned char* contentpos = strstr(request, "Content-Length: ");
-			contentpos += 16;
-			unsigned char* ptra = contentpos;
-			int found = 0, eol_matched = 0;
-			while(!found){	//TODO: duplicate, functionize?
-				if(*ptra == EOL[eol_matched]) {
-					eol_matched++;
-					if(eol_matched == EOL_SIZE) {
-						*(ptra+1-EOL_SIZE) = '\0';
-						found = 1;
-					}
-				} else {
-					eol_matched = 0;
+
+			char delim[] = ": ";		//TODO split properly
+			int count = 0;
+			while(recv_line(sockfd, header)){
+				if(headers.size -2 == count){
+					resize(&headers, count+10);
 				}
-				ptra++;
+				char *ptr = strtok(header, delim);
+				if(ptr == NULL){
+					break;
+				}
+				strcpy(headers.keys[count], ptr);
+				ptr = strtok(NULL, delim);
+				strcpy(headers.values[count], ptr);
+
+				count++;
 			}
-			contentLength = atoi(contentpos);
+
+			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
+			recv(sockfd, content, contentLength, 0);
+			printf("Content-Length: %d\nContent: %s\n", contentLength, content);
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");
@@ -148,6 +151,7 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 		} // end if block for valid request
 	} // end if block for valid HTTP
 	shutdown(sockfd, SHUT_RDWR); // close the socket gracefully
+	end(&headers);
 }
 
 /* This function accepts an open file descriptor and returns
