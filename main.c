@@ -97,26 +97,44 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 			ptr = request + 5;
 			type = POST;
 
-			char delim[] = ": ";		//TODO split properly
-			int count = 0;
+			char value[100];
+			int i, matched = 0, count = 0;
 			while(recv_line(sockfd, header)){
 				if(headers.size -2 == count){
 					resize(&headers, count+10);
 				}
-				char *ptr = strtok(header, delim);
-				if(ptr == NULL){
-					break;
+
+				for(i = 0; i < strlen(header); i++){
+//					printf("Header[%d]: %c\n", i, header[i]);
+					if(header[i] == ": "[matched]){
+						matched++;
+//						printf("I:%d\n", i);
+						if(matched == 2){
+//							printf("%d\n", i);
+							value[i-1] = '\0';
+							strcpy(headers.keys[count], value);		//TODO: only use keys.value[]
+							break;
+						}
+					}else{
+						matched = 0;
+					}
+					value[i] = header[i];
 				}
-				strcpy(headers.keys[count], ptr);
-				ptr = strtok(NULL, delim);
-				strcpy(headers.values[count], ptr);
+//				printf("I2:%d\n", i);
+//				dump(header, strlen(header)+1);
+//				dump(value, strlen(value)+1);
+//				printf("%s\n", &header[i+1]);
+
+				strcpy(headers.values[count], &header[i+1]);
 
 				count++;
 			}
+			printLinkedList(&headers);
 
 			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
 			recv(sockfd, content, contentLength, 0);
-			printf("Content-Length: %d\nContent: %s\n", contentLength, content);
+			dump(content, contentLength);
+//			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");

@@ -47,7 +47,7 @@ int recv_line(int sockfd, unsigned char *dest_buffer) {
 		if(*ptr == EOL[eol_matched]) { // does this byte match terminator
 			eol_matched++;
 			if(eol_matched == EOL_SIZE) { // if all bytes match terminator,
-				*(ptr+1) = '\0';//*(ptr+1-EOL_SIZE) = '\0'; // terminate the string
+				*(ptr+1-EOL_SIZE) = '\0';//*(ptr+1-EOL_SIZE) = '\0'; // terminate the string
 				return strlen(dest_buffer); // return bytes recevied
 			}
 		} else {

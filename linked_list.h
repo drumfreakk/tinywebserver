@@ -8,7 +8,7 @@
 #define KEY_SIZE 20
 #define VAL_SIZE 20
 
-struct Linked_List{
+struct Linked_List{		//TODO struct with key+value+pointer to next
 	char **keys;
 	char **values;
 	int size;
@@ -78,6 +78,12 @@ void end(struct Linked_List *list){
 	}
 	free(list->keys);
 	free(list->values);
+}
+
+void printLinkedList(struct Linked_List *list){
+	for(int i = 0; i < list->size; i++){
+		printf("[%d]:\t%s\t\t-->\t%s\n", i, list->keys[i], list->values[i]);
+	}
 }
 
 #endif
