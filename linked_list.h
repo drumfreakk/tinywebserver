@@ -28,6 +28,8 @@ int init_list(struct Linked_List *list, int size){
 		if(list->keys[i] == NULL || list->values == NULL){
 			return 1;
 		}
+		strcpy(list->keys[i], "");
+		strcpy(list->values[i], "");
 	}
 	return 0;
 }
@@ -49,6 +51,8 @@ int resize(struct Linked_List *list, int newsize){
 		if(list->keys[i] == NULL || list->values == NULL){
 			return 1;
 		}
+		strcpy(list->keys[i], "");
+		strcpy(list->values[i], "");
 	}
 
 	list->size = newsize;
@@ -82,6 +86,9 @@ void end(struct Linked_List *list){
 
 void printLinkedList(struct Linked_List *list){
 	for(int i = 0; i < list->size; i++){
+		if(strcmp(list->keys[i], "") == 0){
+			continue;
+		}
 		printf("[%d]:\t%s\t\t-->\t%s\n", i, list->keys[i], list->values[i]);
 	}
 }

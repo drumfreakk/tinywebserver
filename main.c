@@ -134,7 +134,7 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
 			recv(sockfd, content, contentLength, 0);
 			dump(content, contentLength);
-//			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
+			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");
