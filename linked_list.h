@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define NODE
+
+#ifdef LIST
+
 #define KEY_SIZE 20
 #define VAL_SIZE 20
 
@@ -92,5 +96,48 @@ void printLinkedList(struct Linked_List *list){
 		printf("[%d]:\t%s\t\t-->\t%s\n", i, list->keys[i], list->values[i]);
 	}
 }
+
+#endif
+#ifdef NODE
+
+struct Node{
+	char *key;
+	char *data;
+	struct Node *next;
+};
+
+struct Node *head = NULL;
+
+void insertNew(char *key, char *data){
+	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+	strcpy(newNode->key, &key);				//TODO Fix the sigsegv
+	strcpy(newNode->data, &data);
+
+	newNode->next = head;
+	head = newNode;
+}
+
+void removeHead(){
+	struct Node *newHead = head->next;
+	newHead->next = NULL;
+	free(head);
+	head = newHead;
+}
+
+void removeList(){
+	while(head->next != NULL){
+		removeHead();
+	}
+}
+
+void printList(){
+	struct Node *current = head;
+	while(current->next != NULL){
+		printf("%s\t\t-->\t%s\n", current->key, current->data);
+		current = current->next;
+	}
+}
+
+#endif
 
 #endif

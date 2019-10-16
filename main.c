@@ -72,8 +72,10 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 	unsigned char *ptr, request[500], resource[500], header[500], content[500];
 	int fd, length, contentLength;
 	enum HTTPType type;
+#ifdef LIST
 	struct Linked_List headers;
 	init_list(&headers, 20);
+#endif
 
 	length = recv_line(sockfd, request);
 	//dump(request, length);
@@ -100,9 +102,11 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 			char value[100];
 			int i, matched = 0, count = 0;
 			while(recv_line(sockfd, header)){
+#ifdef LIST
 				if(headers.size -2 == count){
 					resize(&headers, count+10);
 				}
+#endif
 
 				for(i = 0; i < strlen(header); i++){
 //					printf("Header[%d]: %c\n", i, header[i]);
@@ -112,7 +116,13 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 						if(matched == 2){
 //							printf("%d\n", i);
 							value[i-1] = '\0';
+#ifdef NODE
+							insertNew(value, (char *) header[i + 1]);
+#endif
+#ifdef LIST
 							strcpy(headers.keys[count], value);		//TODO: only use keys.value[]
+							strcpy(headers.values[count], &header[i+1]);
+#endif
 							break;
 						}
 					}else{
@@ -125,16 +135,19 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 //				dump(value, strlen(value)+1);
 //				printf("%s\n", &header[i+1]);
 
-				strcpy(headers.values[count], &header[i+1]);
-
 				count++;
 			}
+#ifdef LIST
 			printLinkedList(&headers);
+#endif
+#ifdef NODE
+			printList();
+#endif
 
-			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
-			recv(sockfd, content, contentLength, 0);
-			dump(content, contentLength);
-			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
+//			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
+//			recv(sockfd, content, contentLength, 0);
+//			dump(content, contentLength);
+//			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");
@@ -169,7 +182,12 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 		} // end if block for valid request
 	} // end if block for valid HTTP
 	shutdown(sockfd, SHUT_RDWR); // close the socket gracefully
+#ifdef NODE
+	removeList();
+#endif
+#ifdef LIST
 	end(&headers);
+#endif
 }
 
 /* This function accepts an open file descriptor and returns
