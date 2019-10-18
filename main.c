@@ -11,26 +11,47 @@
 #include "linked_list.h"
 
 int main(void){
+	data_t data;
 	node_t * head = NULL;
-	init_list(&head, 1);
+
+	init_list(&head, "1", "a");
 	print_list(head);
-	push(&head, 0);
+
+	push(&head, "0", "b");
 	print_list(head);
-	add_last(head, 2);
-	add_last(head, 3);
-	add_last(head, 4);
-	add_last(head, 5);
-	add_last(head, 6);
-	add_last(head, 7);
+
+	add_last(head, "2", "c");
+	add_last(head, "3", "d");
+	add_last(head, "4", "e");
+	add_last(head, "5", "f");
+	add_last(head, "6", "g");
+	add_last(head, "7", "h");
 	print_list(head);
-	printf("Pop:%d\n\n", pop(&head));
+
+	printf("Pop:");
+	data = pop(&head);
+	print_data(&data);
+	clear_data(&data);
 	print_list(head);
-	printf("Last:%d\n\n", remove_last(head));
+
+	printf("Last:");
+	data = remove_last(head);
+	print_data(&data);
+	clear_data(&data);
 	print_list(head);
-	printf("Index:%d\n\n", remove_by_index(&head, 2));
+
+	printf("Index:");
+	data = remove_by_index(&head, 2);
+	print_data(&data);
+	clear_data(&data);
 	print_list(head);
-	printf("Value:%d\n\n", remove_by_value(&head, 8));
+
+	printf("Value:");
+	data = remove_by_value(&head, "5");
+	print_data(&data);
+	clear_data(&data);
 	print_list(head);
+
 	clear_list(&head);
 
 	return 0;
