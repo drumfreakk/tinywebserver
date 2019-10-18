@@ -10,6 +10,54 @@
 #include "hacking-network.h"
 #include "linked_list.h"
 
+//struct Test{
+//	int s;
+////	int *f;
+//};
+//
+//void test(struct Test *a){
+//	printf("%d\n", a->s);
+////	printf("%d\n", (int)a->f);
+//	a->s = 7;
+//}
+//
+//void testN(struct Test *a){
+////	a = malloc(sizeof(struct Test));
+//	a->s = 8;
+//}
+//
+//int main(void){
+////	struct Node *head = NULL;
+////	insertNew(head, "Key", "Data");
+//////	insertNew(head, "Key2", "Data2");
+////	removeHead(head);
+////	insertNew(head, "Key3", "Data3");
+////	printList(head);
+////	removeList(head);
+//
+//int z = 2;
+////	struct Test g;
+////	g.s = 4;
+////	g.f = z;
+//	struct Test d;
+////	d = &g;
+//
+//
+////	test(d);
+////	printf("%d\n", d->s);
+//	testN(&d);
+//z = 6;
+////	d->f = z;
+//	test(&d);
+//	d.s = 9;
+//	test(&d);
+////	free(&d);
+//
+//	return 0;
+//}
+
+
+
 #define PORT 8080   // the port users will be connecting to
 #define WEBROOT "./webroot" // the web server's root directory
 
@@ -117,7 +165,7 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 //							printf("%d\n", i);
 							value[i-1] = '\0';
 #ifdef NODE
-							insertNew(value, (char *) header[i + 1]);
+							insertNew(value, &header[i + 1]);
 #endif
 #ifdef LIST
 							strcpy(headers.keys[count], value);		//TODO: only use keys.value[]

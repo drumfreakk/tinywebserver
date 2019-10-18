@@ -106,35 +106,41 @@ struct Node{
 	struct Node *next;
 };
 
-struct Node *head = NULL;
 
-void insertNew(char *key, char *data){
+
+void insertNew(struct Node *head, char *key, char *data){
 	struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
-	strcpy(newNode->key, &key);				//TODO Fix the sigsegv
-	strcpy(newNode->data, &data);
+//	newNode->key = malloc(sizeof(char) * 20);
+//	newNode->data = malloc(sizeof(char) * 20);
+//	strcpy(newNode->key, key);				//TODO Fix the sigabrt
+//	strcpy(newNode->data, data);
 
 	newNode->next = head;
 	head = newNode;
+//	printf("New: %x: %s\t-->\t%s\t@\t%x\n", head->next, head->key, head->data, head);
 }
 
-void removeHead(){
+void removeHead(struct Node *head){
 	struct Node *newHead = head->next;
-	newHead->next = NULL;
+//	free(head->key);
+//	free(head->data);
 	free(head);
 	head = newHead;
 }
 
-void removeList(){
+void removeList(struct Node *head){
 	while(head->next != NULL){
-		removeHead();
+		removeHead(head);
 	}
 }
 
-void printList(){
+void printList(struct Node *head){
 	struct Node *current = head;
-	while(current->next != NULL){
-		printf("%s\t\t-->\t%s\n", current->key, current->data);
-		current = current->next;
+	while(current != NULL){
+//		printf("%x: %s\t-->\t%s\t\t%x\n", current, current->key, current->data, current->next);
+		printf("%x:%x\n", current, current->next);
+//		printf("%s\t-->\t%s\n", current->key, current->data);
+		current = current->next;	//TODO fix double last
 	}
 }
 
