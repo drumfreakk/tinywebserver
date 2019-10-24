@@ -42,5 +42,6 @@ void dump(const unsigned char *data_buffer, const unsigned int length) {
 			printf("\n"); // end of the dump line (each line 16 bytes)
 		} // end if
 	} // end for
+	printf("\n");
 }
 

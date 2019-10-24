@@ -60,13 +60,13 @@ void print_list(node_t *head){
 	printf("\n");
 }
 
-int init_list(node_t **head, char *key, char *value){
+int init_list(node_t **head){
 	node_t *new_node = NULL;
 	new_node = malloc(sizeof(node_t));
 	if(new_node == NULL){
 		return -1;
 	}
-	init_data(&new_node->data, key, value);
+	init_data(&new_node->data, "", "");
 //	strcpy(new_node->data.key, key);
 //	strcpy(new_node->data.value, value);
 	*head = new_node;
@@ -190,7 +190,44 @@ data_t remove_by_value(node_t ** head, char *key){
 	return ret;
 }
 
+data_t get_by_value(node_t *head, char*key){
+	node_t *current = head;
+	while(current != NULL){
+		if(strcmp(current->data.key, key) == 0){
+			return current->data;
+		}
+		current = current->next;
+	}
+	data_t ret;
+	printf("hi");
+	clear_data(&ret);
+	return ret;
+}
+
 void clear_list(node_t **head){
 	while(pop(head).key != NULL){}
+}
+
+//TODO limits
+int stringToData(data_t *data, char *string, char *splitData){
+	clear_data(data);
+	init_data(data, "", "");
+
+	int matched = 0, splitLen = strlen(splitData);
+
+	for(int i = 0; i < strlen(string); i++){
+		if(string[i] == splitData[matched]){
+			matched++;
+			if(matched == splitLen){
+				data->key[i+1-splitLen] = '\0';
+				strcpy(data->value, &string[i+1]);
+				break;
+			}
+		}else{
+			matched = 0;
+		}
+		data->key[i] = string[i];
+	}
+	return 0;
 }
 

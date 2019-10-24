@@ -1,8 +1,8 @@
 #ifndef TODO_WEBAPP_LINKED_LIST_H
 #define TODO_WEBAPP_LINKED_LIST_H
 
-#define KEY_SIZE 20
-#define VALUE_SIZE 20
+#define KEY_SIZE 200
+#define VALUE_SIZE 200
 
 typedef struct Keypair{
 	char *key;
@@ -13,12 +13,13 @@ int checkDataValidity(data_t *data);
 
 void clear_data(data_t *data);
 
-//TODO: check is NULL?
 int init_data(data_t *data, char *key, char *value);
 
 void print_data(data_t *data);
 
 void pop_data(data_t *to_clear, data_t *out);
+
+int stringToData(data_t *data, char *string, char *splitData);
 
 typedef struct Node{
 	data_t data;
@@ -28,13 +29,12 @@ typedef struct Node{
 
 void print_list(node_t *head);
 
-int init_list(node_t **head, char *key, char *value);
+int init_list(node_t **head);
 
 int add_last(node_t *head, char *key, char *value);
 
 int push(node_t **head, char *key, char *value);
 
-//TODO memory?
 data_t pop(node_t **head);
 
 data_t remove_last(node_t * head);
@@ -43,6 +43,9 @@ data_t remove_by_index(node_t ** head, int n);
 
 data_t remove_by_value(node_t ** head, char *key);
 
+data_t get_by_value(node_t *head, char*key);
+
 void clear_list(node_t **head);
+
 
 #endif
