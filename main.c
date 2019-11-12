@@ -10,11 +10,12 @@
 #include "hacking-network.h"
 #include "linked_list.h"
 
-#define TEST_LIST
+//#define TEST_LIST
 
 #ifdef TEST_LIST
 int main(void){
-	data_t *data = NULL;
+	data_t data;
+	init_data(&data, "", "");
 	node_t * head = NULL;
 
 	init_list(&head);
@@ -34,34 +35,43 @@ int main(void){
 	print_list(head);
 
 	printf("Pop:");
-	data = pop(&head);
+	pop(&head, &data);
 	print_data(&data);
 	clear_data(&data);
 	print_list(head);
 
-//	printf("Last:");
-//	data = remove_last(head);
-//	print_data(&data);
-//	clear_data(&data);
-//	print_list(head);
-//
-//	printf("Index:");
-//	data = remove_by_index(&head, 2);
-//	print_data(&data);
-//	clear_data(&data);
-//	print_list(head);
-//
-//	printf("Value(pop):");
-//	data = remove_by_value(&head, "5");
-//	print_data(&data);
-//	clear_data(&data);
-//	print_list(head);
+	printf("Last:");
+	remove_last(head, &data);
+	print_data(&data);
+	clear_data(&data);
+	print_list(head);
 
-//	printf("Value(keep):");
-//	data = get_by_value(&head, "4");
-//	print_data(&data);
-//	clear_data(&data);
-//	print_list(head);
+	printf("Index(pop):");
+	remove_by_index(&head, &data, 2);
+	print_data(&data);
+	clear_data(&data);
+	print_list(head);
+
+	data_t *data_pointer = NULL;
+
+	printf("Index(keep):");
+	get_data_by_index(head, &data_pointer, 3);
+	print_data(data_pointer);
+	print_list(head);
+
+	printf("Value(pop):");
+	remove_by_key(&head, &data, "5");
+	print_data(&data);
+	clear_data(&data);
+	print_list(head);
+
+	printf("Value(keep):");
+	get_data_by_key(head, &data_pointer, "4");
+	print_data(data_pointer);
+	print_list(head);
+
+	printf("Index:%d\n", get_index_by_key(head, "2"));
+	print_list(head);
 
 	stringToData(&head->data, "hello::s:friend:::hi", ":::");
 	print_list(head);
@@ -188,11 +198,19 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 			}
 			print_list(headers);
 
+			data_t *data = NULL;
+			get_data_by_key(headers, &data, "Content-Length");
 
-			contentLength = atoi(getValueByKey(&headers, "Content-Length"));
-			recv(sockfd, content, contentLength, 0);
+			contentLength = atoi(data->value);
+			char *ptr = content;
+//			recv(sockfd, content, contentLength, 0);
+			for(i = 0; i < contentLength; i++){
+				recv(sockfd, ptr, 1, 0);
+				ptr++;
+			}
+			*ptr = '\0';
 			dump(content, contentLength);
-			printf("Content-Length: %d\nContent: %s\n", contentLength, content);	//TODO fix double free or corruption(out)(free linked list?)
+			printf("Content-Length: %d\nContent: %s\n", contentLength, content);
 		}
 		if(ptr == NULL) { // then this is not a recognized request
 			printf("\tUNKNOWN REQUEST!\n");

@@ -35,15 +35,19 @@ int add_last(node_t *head, char *key, char *value);
 
 int push(node_t **head, char *key, char *value);
 
-data_t pop(node_t **head);
+int pop(node_t **head, data_t *ret);
 
-data_t remove_last(node_t * head);
+int remove_last(node_t * head, data_t *ret);
 
-data_t remove_by_index(node_t ** head, int n);
+int remove_by_index(node_t ** head, data_t *ret, int n);
 
-data_t remove_by_value(node_t ** head, char *key);
+int remove_by_key(node_t ** head, data_t *ret, char *key);
 
-data_t get_by_value(node_t *head, char*key);
+int get_data_by_key(node_t *head, data_t **ret, char *key);
+
+int get_data_by_index(node_t *head, data_t **ret, int n);
+
+int get_index_by_key(node_t *head, char *key);
 
 void clear_list(node_t **head);
 

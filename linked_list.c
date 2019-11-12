@@ -49,15 +49,18 @@ void pop_data(data_t *to_clear, data_t *out){
 	}
 }
 
+//TODO fix this
 void print_list(node_t *head){
-	node_t * current = head;
-
-	while (current != NULL) {
-		printf("[]: ");
-		print_data(&current->data);
-		current = current->next;
-	}
-	printf("\n");
+//	node_t * current = head;
+//	int i = 0;
+//
+//	while (current != NULL) {
+//		printf("[%d]: ", i);
+//		print_data(&current->data);
+//		current = current->next;
+//		i++;
+//	}
+//	printf("\n");
 }
 
 int init_list(node_t **head){
@@ -103,32 +106,27 @@ int push(node_t **head, char *key, char *value){
 }
 
 //TODO memory?
-data_t pop(node_t **head){
-	data_t retval;
-	init_data(&retval, "", "");
+int pop(node_t **head, data_t *ret){
 	node_t * next_node = NULL;
 
 	if (*head == NULL) {
-		clear_data(&retval);
-		return retval;
+		return -1;
 	}
 
 	next_node = (*head)->next;
-	pop_data(&(*head)->data, &retval);
+	pop_data(&(*head)->data, ret);
 	free(*head);
 	*head = next_node;
 
-	return retval;
+	return 0;
 }
 
-data_t remove_last(node_t * head){
-	data_t retval;
-	init_data(&retval, "", "");
+int remove_last(node_t * head, data_t *ret){
 	/* if there is only one item in the list, remove it */
 	if (head->next == NULL) {
-		pop_data(&head->data, &retval);
+		pop_data(&head->data, ret);
 		free(head);
-		return retval;
+		return 0;
 	}
 
 	/* get to the second to last node in the list */
@@ -138,74 +136,97 @@ data_t remove_last(node_t * head){
 	}
 
 	/* now current points to the second to last item of the list, so let's remove current->next */
-	pop_data(&current->next->data, &retval);
+	pop_data(&current->next->data, ret);
 	free(current->next);
 	current->next = NULL;
-	return retval;
+	return 0;
 
 }
 
-data_t remove_by_index(node_t ** head, int n){
+int remove_by_index(node_t ** head, data_t *ret, int n){
 	int i = 0;
-	data_t retval;
-	init_data(&retval, "", "");
 	node_t * current = *head;
 	node_t * temp_node = NULL;
 
 	if (n == 0) {
-		return pop(head);
+		return pop(head, ret);
 	}
 
 	for (i = 0; i < n-1; i++) {
 		if (current->next == NULL) {
-			clear_data(&retval);
-			return retval;
+			clear_data(ret);
+			return -1;
 		}
 		current = current->next;
 	}
 
 	temp_node = current->next;
-	pop_data(&temp_node->data, &retval);
+	pop_data(&temp_node->data, ret);
 
 	current->next = temp_node->next;
 	free(temp_node);
 
-	return retval;
-
+	return 0;
 }
 
-data_t remove_by_value(node_t ** head, char *key){
+int remove_by_key(node_t ** head, data_t *ret, char *key){
 	node_t * current = *head;
 	int count = 0;
 
 	while (current != NULL) {
 		if(strcmp(current->data.key, key) == 0){
-			return remove_by_index(head, count);
+			return remove_by_index(head, ret, count);
 		}
 		count++;
 		current = current->next;
 	}
-	data_t ret;
-	clear_data(&ret);
-	return ret;
+	clear_data(ret);
+	return -1;
 }
 
-data_t get_by_value(node_t *head, char*key){
+int get_data_by_key(node_t *head, data_t **ret, char *key){
 	node_t *current = head;
 	while(current != NULL){
 		if(strcmp(current->data.key, key) == 0){
-			return current->data;
+			*ret = &current->data;
+			return 0;
 		}
 		current = current->next;
 	}
-	data_t ret;
-	printf("hi");
-	clear_data(&ret);
-	return ret;
+	return -1;
+}
+
+int get_data_by_index(node_t *head, data_t **ret, int n){
+	node_t *current = head;
+	int count = 0;
+	while(current != NULL){
+		if(count == n){
+			*ret = &current->data;
+			return 0;
+		}
+		count++;
+		current = current->next;
+	}
+	return -1;
+}
+
+int get_index_by_key(node_t *head, char *key){
+	node_t *current = head;
+	int count = 0;
+	while(current != NULL){
+		if(strcmp(current->data.key, key) == 0){
+			return count;
+		}
+		count++;
+		current = current->next;
+	}
+	return -1;
 }
 
 void clear_list(node_t **head){
-	while(pop(head).key != NULL){}
+	data_t ret;
+	init_data(&ret, "", "");
+	while(pop(head, &ret) == 0){}
 }
 
 //TODO limits
