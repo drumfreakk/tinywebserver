@@ -86,7 +86,7 @@ int main(void){
 #ifndef TEST_LIST
 
 #define PORT 8080   // the port users will be connecting to
-#define WEBROOT "./webroot" // the web server's root directory
+#define WEBROOT "/home/kip/CLionProjects/tinywebserver/webroot" // the web server's root directory
 
 void handle_connection(int, struct sockaddr_in *); // handle web requests
 int get_file_size(int); // returns the filesize of open file descriptor
