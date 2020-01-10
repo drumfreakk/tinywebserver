@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+//#define SMALL_PRINT
+
 int checkDataValidity(data_t *data){
 	return (data->key != NULL && data->value != NULL);
 }
@@ -51,16 +53,31 @@ void pop_data(data_t *to_clear, data_t *out){
 
 //TODO fix this
 void print_list(node_t *head){
-//	node_t * current = head;
-//	int i = 0;
-//
-//	while (current != NULL) {
-//		printf("[%d]: ", i);
-//		print_data(&current->data);
-//		current = current->next;
-//		i++;
-//	}
-//	printf("\n");
+    node_t * current = head;
+    int i = 0;
+#ifdef SMALL_PRINT
+    char toPrint[1024], tempPrint[256];
+    toPrint[0] = '[';
+    i = 1;
+    while (current != NULL) {
+        if(checkDataValidity(&current->data)) {
+            printf(tempPrint, "%s --> %s, ", current->data.key, current->data.value);
+        }
+        i += strlen(tempPrint);
+        sprintf(&toPrint[i], "%s", tempPrint);
+        current = current->next;
+    }
+    sprintf(&toPrint[i-2], "]");
+    printf("%s\n", toPrint);
+#else
+    while (current != NULL) {
+        printf("[%d]: ", i);
+        print_data(&current->data);
+        current = current->next;
+        i++;
+    }
+    printf("\n");
+#endif
 }
 
 int init_list(node_t **head){

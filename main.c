@@ -22,6 +22,7 @@ int main(void){
 	print_list(head);
 	strcpy(head->data.key, "1");
 	strcpy(head->data.value, "a");
+	print_list(head);
 
 	push(&head, "0", "b");
 	print_list(head);
@@ -173,7 +174,7 @@ void handle_connection(int sockfd, struct sockaddr_in *client_addr_ptr) {
 			char value[100];
 			int i, matched = 0, count = 0;
 			init_list(&headers);
-			while(recv_line(sockfd, header)){
+			while(recv_line(sockfd, header)){       //TODO: seems to infinitely loop forever receiving the headers
 //				push(&headers, "", "");
 //				stringToData(&headers->data, header, ": ");
 
