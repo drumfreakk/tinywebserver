@@ -1,0 +1,5 @@
+test: test_prereq main
+
+test_prereq:
+	create test.c with main()
+	set sources & objeccts
